@@ -23,7 +23,8 @@ class Sensor:
         self.name = name
         self.unit = unit
 
-    def summary(self, readings: list[float]) -> dict:
+    def summary(self, readings: list[float]) -> dict[str, int | float | str |
+                                                    list[float]]:
         """Return summary of sensor reading. Take readings and temperature threshold."""
         if len(readings) != 0:
             return {"count": len(readings), "min": min(readings), "max": max(readings),
@@ -46,7 +47,8 @@ class TemperatureSensor(Sensor):
 class PressureSensor(Sensor):
     """Counts how many readings are out of temperature range."""
 
-    def summary(self, readings: list[float]) -> dict:
+    def summary(self, readings: list[float]) -> dict[str, int | float | str |
+                                                    list[float]]:
         """Count how many readings are below 90F and above 110F."""
         base = super().summary(readings)
         count = 0
@@ -57,7 +59,8 @@ class PressureSensor(Sensor):
         return base
 
 
-def summarize(readings: list[float]) -> dict:
+def summarize(readings: list[float]) -> dict[str, int | float | None |
+                                            str | list[float]]:
     """Return dictionary for readings information."""
     if len(readings) != 0:
         return {"count": len(readings), "min": min(readings),
