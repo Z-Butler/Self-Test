@@ -7,12 +7,13 @@ The code here already follows the standard we expect from you: type hints and a
 short docstring on every function. Match that bar in everything you add, and
 keep the program runnable after each task.
 """
+
 # This program gives a summary of sensors and readings information.
 import pandas as pd
 from matplotlib import pyplot as plt
 
 # Loads sensor readings data
-data = pd.read_csv("data.csv")
+readings_df = pd.read_csv("data.csv")
 
 
 class Sensor:
@@ -23,8 +24,11 @@ class Sensor:
         self.name = name
         self.unit = unit
 
-    def summary(self, readings: list[float]) -> dict[str, int | float | str |
-                                                    list[float]]:
+    def summary(self, readings: list[float]) -> dict[str, int |
+                                                          float |
+                                                          str |
+                                                          list[float]]:
+
         """Return summary of sensor reading. Take readings and temperature threshold."""
         if len(readings) != 0:
             return {"count": len(readings), "min": min(readings), "max": max(readings),
@@ -47,8 +51,11 @@ class TemperatureSensor(Sensor):
 class PressureSensor(Sensor):
     """Counts how many readings are out of temperature range."""
 
-    def summary(self, readings: list[float]) -> dict[str, int | float | str |
-                                                    list[float]]:
+    def summary(self, readings: list[float]) -> dict[str, int |
+                                                          float |
+                                                          str |
+                                                          list[float]]:
+
         """Count how many readings are below 90F and above 110F."""
         base = super().summary(readings)
         count = 0
@@ -59,8 +66,12 @@ class PressureSensor(Sensor):
         return base
 
 
-def summarize(readings: list[float]) -> dict[str, int | float | None |
-                                            str | list[float]]:
+def summarize(readings: list[float]) -> dict[str, int |
+                                                  float |
+                                                  None |
+                                                  str |
+                                                  list[float]]:
+
     """Return dictionary for readings information."""
     if len(readings) != 0:
         return {"count": len(readings), "min": min(readings),
@@ -73,15 +84,19 @@ def summarize(readings: list[float]) -> dict[str, int | float | None |
                 "readings_above": "No data"}
 
 
-def sensor_temperature_raw(dataframe: pd.DataFrame[str, float], column1: str,
-                           column2: str, sensor: str) -> pd.DataFrame[str, float]:
-    """Return average temperature per sensor."""
+def sensor_temperature_raw(dataframe: pd.DataFrame[str, float],
+                           column1: str,
+                           column2: str,
+                           sensor: str) -> pd.DataFrame[str, float]:
+    """Return temperature per sensor."""
     sensors = dataframe.groupby(column1)[column2].apply(list)
     return sensors[sensor]
 
 
-def sensor_temperature(dataframe: pd.DataFrame[str, float], column1: str,
-                       column2: str, sensor: str) -> pd.DataFrame[str, float]:
+def sensor_temperature(dataframe: pd.DataFrame[str, float],
+                       column1: str,
+                       column2: str,
+                       sensor: str) -> pd.DataFrame[str, float]:
     """Return average temperature per sensor."""
     sensors = dataframe.groupby(column1)[column2].mean()
     return sensors[sensor]
@@ -150,30 +165,30 @@ def main() -> None:
         print()  # Add break inbetween each entry for CLI readability.
 
     # CSV file average temperature readings
-    print("Average temperature (C):", round(data["temperature_c"].mean(), 2))
+    print("Average temperature (C):", round(readings_df["temperature_c"].mean(), 2))
 
     print("Average temperature of sensor A (C):", round(sensor_temperature
-                                                        (dataframe=data,
+                                                        (dataframe=readings_df,
                                                          column1="sensor_id",
                                                          column2="temperature_c",
                                                          sensor="sensor_A"), 2))
     print("Average temperature of sensor B (C):", round(sensor_temperature
-                                                        (dataframe=data,
+                                                        (dataframe=readings_df,
                                                          column1="sensor_id",
                                                          column2="temperature_c",
                                                          sensor="sensor_B"), 2))
 
-    timestamp: pd.Series = data.groupby("sensor_id")["timestamp"].apply(list)
+    timestamp: pd.Series = readings_df.groupby("sensor_id")["timestamp"].apply(list)
 
     # Graph plotting
     fig, ax = plt.subplots()
-    ax.plot(timestamp["sensor_A"], sensor_temperature_raw(dataframe=data,
+    ax.plot(timestamp["sensor_A"], sensor_temperature_raw(dataframe=readings_df,
                                                           column1="sensor_id",
                                                           column2="temperature_c",
                                                           sensor="sensor_A"),
             label="Sensor A")
 
-    ax.plot(timestamp["sensor_B"], sensor_temperature_raw(dataframe=data,
+    ax.plot(timestamp["sensor_B"], sensor_temperature_raw(dataframe=readings_df,
                                                           column1="sensor_id",
                                                           column2="temperature_c",
                                                           sensor="sensor_B"),
