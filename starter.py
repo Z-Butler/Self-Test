@@ -31,13 +31,19 @@ class Sensor:
 
         """Return summary of sensor reading. Take readings and temperature threshold."""
         if len(readings) != 0:
-            return {"count": len(readings), "min": min(readings), "max": max(readings),
+            return {"count": len(readings),
+                    "min": min(readings),
+                    "max": max(readings),
                     "mean": round(average(readings), 2),
-                    "readings_above": readings_above(readings)}
+                    "readings_above": readings_above(readings)
+                   }
         else:
-            return {"count": len(readings), "min": "No data", "max": "No data",
+            return {"count": len(readings),
+                    "min": "No data",
+                    "max": "No data",
                     "mean": "No data",
-                    "readings_above": "No data"}
+                    "readings_above": "No data"
+                   }
 
 
 class TemperatureSensor(Sensor):
@@ -74,20 +80,26 @@ def summarize(readings: list[float]) -> dict[str, int |
 
     """Return dictionary for readings information."""
     if len(readings) != 0:
-        return {"count": len(readings), "min": min(readings),
+        return {"count": len(readings),
+                "min": min(readings),
                 "max": max(readings),
                 "mean": average(readings),
-                "above_21": readings_above(readings)}
+                "above_21": readings_above(readings)
+               }
     else:
-        return {"count": len(readings), "min": "No data", "max": "No data",
+        return {"count": len(readings),
+                "min": "No data",
+                "max": "No data",
                 "mean": "No data",
-                "readings_above": "No data"}
+                "readings_above": "No data"
+               }
 
 
 def sensor_temperature_raw(dataframe: pd.DataFrame[str, float],
                            column1: str,
                            column2: str,
-                           sensor: str) -> pd.DataFrame[str, float]:
+                           sensor: str
+                           ) -> pd.DataFrame[str, float]:
     """Return temperature per sensor."""
     sensors = dataframe.groupby(column1)[column2].apply(list)
     return sensors[sensor]
@@ -96,7 +108,8 @@ def sensor_temperature_raw(dataframe: pd.DataFrame[str, float],
 def sensor_temperature(dataframe: pd.DataFrame[str, float],
                        column1: str,
                        column2: str,
-                       sensor: str) -> pd.DataFrame[str, float]:
+                       sensor: str
+                       ) -> pd.DataFrame[str, float]:
     """Return average temperature per sensor."""
     sensors = dataframe.groupby(column1)[column2].mean()
     return sensors[sensor]
@@ -136,30 +149,41 @@ def main() -> None:
 
     # Main readings summaries
     print("Number of readings:", len(readings))
+
     # Stops unexpected crash if 0 readings. Can't return 0 since that is a temperature.
     if average(readings) is None or readings_range(readings) is None:
         print("Average temperature (C): No data")
         print("Temperature range (C): No data")
+
     else:
         print("Average temperature (C):", round(average(readings), 2))
         print("Temperature range (C):", round(readings_range(readings), 2))
+
     print("Temperature readings (F):", str([celsius_to_fahrenheit(celsius=reading)
                                             for reading in readings]).strip("[]")
           )
+
     print(summarize(readings))
     print()  # Add break for CLI readability.
 
     # Sensor and summary loop
-    main_sensor = Sensor(name="main_sensor", unit="C")
-    temperature_sensor = TemperatureSensor(name="temperature_sensor", unit="F")
-    pressure_sensor = PressureSensor(name="pressure_sensor", unit="C")
-    sensors = [main_sensor, temperature_sensor, pressure_sensor]
+    sensors = [main_sensor := Sensor(name="main_sensor",
+                                     unit="C"
+                                     ),
+               temperature_sensor := TemperatureSensor(name="temperature_sensor",
+                                                       unit="F"
+                                                       ),
+               pressure_sensor := PressureSensor(name="pressure_sensor",
+                                                 unit="C"
+                                                 )
+               ]
     for sensor in sensors:
         print("Sensor name: ", sensor.name)
         print("Sensor unit: ", sensor.unit)
         if sensor == temperature_sensor:
-            fahrenheit_readings = temperature_sensor.to_fahrenheit(readings)
-            print("Temperatures (F): ", fahrenheit_readings)
+            #fahrenheit_readings = temperature_sensor.to_fahrenheit(readings)
+            print("Temperatures (F): ", temperature_sensor.to_fahrenheit(readings))
+
         else:
             print("Readings summary: ", sensor.summary(readings=readings))
         print()  # Add break inbetween each entry for CLI readability.
@@ -171,12 +195,14 @@ def main() -> None:
                                                         (dataframe=readings_df,
                                                          column1="sensor_id",
                                                          column2="temperature_c",
-                                                         sensor="sensor_A"), 2))
+                                                         sensor="sensor_A"), 2)
+          )
     print("Average temperature of sensor B (C):", round(sensor_temperature
                                                         (dataframe=readings_df,
                                                          column1="sensor_id",
                                                          column2="temperature_c",
-                                                         sensor="sensor_B"), 2))
+                                                         sensor="sensor_B"), 2)
+          )
 
     timestamp: pd.Series = readings_df.groupby("sensor_id")["timestamp"].apply(list)
 
@@ -186,13 +212,15 @@ def main() -> None:
                                                           column1="sensor_id",
                                                           column2="temperature_c",
                                                           sensor="sensor_A"),
-            label="Sensor A")
+            label="Sensor A"
+            )
 
     ax.plot(timestamp["sensor_B"], sensor_temperature_raw(dataframe=readings_df,
                                                           column1="sensor_id",
                                                           column2="temperature_c",
                                                           sensor="sensor_B"),
-            label="Sensor B")
+            label="Sensor B"
+            )
 
     # Graph styling
     ax.set_title("Temperatures of Sensors")
