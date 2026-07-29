@@ -28,22 +28,19 @@ class Sensor:
                                                           float |
                                                           str |
                                                           list[float]]:
-
         """Return summary of sensor reading. Take readings and temperature threshold."""
         if len(readings) != 0:
             return {"count": len(readings),
                     "min": min(readings),
                     "max": max(readings),
                     "mean": round(average(readings), 2),
-                    "readings_above": readings_above(readings)
-                   }
+                    "readings_above": readings_above(readings)}
         else:
             return {"count": len(readings),
                     "min": "No data",
                     "max": "No data",
                     "mean": "No data",
-                    "readings_above": "No data"
-                   }
+                    "readings_above": "No data"}
 
 
 class TemperatureSensor(Sensor):
@@ -61,7 +58,6 @@ class PressureSensor(Sensor):
                                                           float |
                                                           str |
                                                           list[float]]:
-
         """Count how many readings are below 90F and above 110F."""
         base = super().summary(readings)
         count = 0
@@ -77,22 +73,19 @@ def summarize(readings: list[float]) -> dict[str, int |
                                                   None |
                                                   str |
                                                   list[float]]:
-
     """Return dictionary for readings information."""
     if len(readings) != 0:
         return {"count": len(readings),
                 "min": min(readings),
                 "max": max(readings),
                 "mean": average(readings),
-                "above_21": readings_above(readings)
-               }
+                "above_21": readings_above(readings)}
     else:
         return {"count": len(readings),
                 "min": "No data",
                 "max": "No data",
                 "mean": "No data",
-                "readings_above": "No data"
-               }
+                "readings_above": "No data"}
 
 
 def sensor_temperature_raw(dataframe: pd.DataFrame[str, float],
@@ -167,16 +160,11 @@ def main() -> None:
     print()  # Add break for CLI readability.
 
     # Sensor and summary loop
-    sensors = [main_sensor := Sensor(name="main_sensor",
-                                     unit="C"
-                                     ),
-               temperature_sensor := TemperatureSensor(name="temperature_sensor",
-                                                       unit="F"
-                                                       ),
-               pressure_sensor := PressureSensor(name="pressure_sensor",
-                                                 unit="C"
-                                                 )
-               ]
+    main_sensor = Sensor(name="main_sensor", unit="C")
+    temperature_sensor = TemperatureSensor(name="temperature_sensor", unit="F")
+    pressure_sensor = PressureSensor(name="pressure_sensor", unit="C")
+
+    sensors = [main_sensor, temperature_sensor, pressure_sensor]
     for sensor in sensors:
         print("Sensor name: ", sensor.name)
         print("Sensor unit: ", sensor.unit)
@@ -186,7 +174,7 @@ def main() -> None:
 
         else:
             print("Readings summary: ", sensor.summary(readings=readings))
-        print()  # Add break inbetween each entry for CLI readability.
+        print()  # Add break in between each entry for CLI readability.
 
     # CSV file average temperature readings
     print("Average temperature (C):", round(readings_df["temperature_c"].mean(), 2))
